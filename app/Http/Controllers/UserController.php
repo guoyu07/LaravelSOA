@@ -39,7 +39,7 @@ class UserController extends Controller
       $user = User::create( $request->all() );
       if(! $user)
       {
-        return $this->responseFAIL("Imposible crear el nuevo usuario.", $request->all());
+        return $this->responseFAIL("Imposible crear el nuevo usuario.", $user);
       }
 
       return $this->responseOK("Usuario creado correctamente.", $user);
@@ -56,7 +56,7 @@ class UserController extends Controller
       $user = User::find($id);
       if(! $user)
       {
-        return $this->responseFAIL("El usuario solicitado no existe.", $id);
+        return $this->responseFAIL("El usuario solicitado no existe.", $user);
       }
 
       return $this->responseOK("Usuario encontrado.", $user);
@@ -80,13 +80,13 @@ class UserController extends Controller
       $user = User::find($id);
       if (! $user)
       {
-        return $this->responseFAIL("El usuario que desea modificar no existe.", $id);
+        return $this->responseFAIL("El usuario que desea modificar no existe.", $user);
       }
 
       $user->fill( $request->all() );
       if(! $user->save())
       {
-        return $this->responseFAIL("Imposible actualizar el usuario solicitado.", $id);
+        return $this->responseFAIL("Imposible actualizar el usuario solicitado.", $user);
       }
 
       return $this->responseOK("Usuario actualizado correctamente.", $user);
@@ -103,12 +103,12 @@ class UserController extends Controller
       $user = User::find($id);
       if(! $user)
       {
-        return $this->responseFAIL("El usuario que desea eliminar no existe.", $id);
+        return $this->responseFAIL("El usuario que desea eliminar no existe.", $user);
       }
 
       if(! $user->delete())
       {
-        return $this->responseFAIL("Imposible eliminar el usuario solicitado.", $id);
+        return $this->responseFAIL("Imposible eliminar el usuario solicitado.", $user);
       }
 
       return $this->responseOK("Usuario eliminado correctamente.", $user);
@@ -119,8 +119,7 @@ class UserController extends Controller
       return Validator::make($request->all(), [
               'first_name' => 'required',
               'last_name' => 'required',
-              'email' => 'required|email',
-              'password' => 'required'
+              'email' => 'required|email'
           ]);
     }
 
@@ -142,9 +141,14 @@ class UserController extends Controller
         if(Auth::attempt($credentials, $remember))
         {
             $user = Auth::user();
-            return $this->responseOK('Login correcto, bienvenid@ '.Auth::user()->full_name);
+            return $this->responseOK('Login correcto, bienvenid@ '.Auth::user()->full_name, $user);
         }
 
-        return $this->responseFAIL('Error al iniciar sesión, credenciales incorrectas');
+        return $this->responseFAIL('Error al iniciar sesión, credenciales incorrectas', "");
+    }
+
+    public function getToken()
+    {
+      return response()->json(['token'=>csrf_token()]);
     }
 }

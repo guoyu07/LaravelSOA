@@ -17,3 +17,4 @@ Route::get('/', function () {
 
 Route::resource('/users', 'UserController', ['only'=>['index','store','update','destroy','show']]);
 Route::post('/login', 'UserController@login');
+Route::get('/token', 'UserController@getToken');
