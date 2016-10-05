@@ -18,6 +18,6 @@ class Controller extends BaseController
 
     public function responseFAIL($message, $data)
     {
-    	return response()->json(['status'=>false,'message'=>$message,'data'=>$data]);
+    	return response()->json(['status'=>false,'message'=>$message,'errors'=>$data]);
     }
 }

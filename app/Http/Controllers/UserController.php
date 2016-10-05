@@ -39,7 +39,7 @@ class UserController extends Controller
       $user = User::create( $request->all() );
       if(! $user)
       {
-        return $this->responseFAIL("Imposible crear el nuevo usuario.", $user);
+        return $this->responseFAIL("Imposible crear el nuevo usuario.", [""]);
       }
 
       return $this->responseOK("Usuario creado correctamente.", $user);
@@ -56,7 +56,7 @@ class UserController extends Controller
       $user = User::find($id);
       if(! $user)
       {
-        return $this->responseFAIL("El usuario solicitado no existe.", $user);
+        return $this->responseFAIL("El usuario solicitado no existe.", [""]);
       }
 
       return $this->responseOK("Usuario encontrado.", $user);
@@ -80,13 +80,13 @@ class UserController extends Controller
       $user = User::find($id);
       if (! $user)
       {
-        return $this->responseFAIL("El usuario que desea modificar no existe.", $user);
+        return $this->responseFAIL("El usuario que desea modificar no existe.", [""]);
       }
 
       $user->fill( $request->all() );
       if(! $user->save())
       {
-        return $this->responseFAIL("Imposible actualizar el usuario solicitado.", $user);
+        return $this->responseFAIL("Imposible actualizar el usuario solicitado.", [""]);
       }
 
       return $this->responseOK("Usuario actualizado correctamente.", $user);
@@ -103,12 +103,12 @@ class UserController extends Controller
       $user = User::find($id);
       if(! $user)
       {
-        return $this->responseFAIL("El usuario que desea eliminar no existe.", $user);
+        return $this->responseFAIL("El usuario que desea eliminar no existe.", [""]);
       }
 
       if(! $user->delete())
       {
-        return $this->responseFAIL("Imposible eliminar el usuario solicitado.", $user);
+        return $this->responseFAIL("Imposible eliminar el usuario solicitado.", [""]);
       }
 
       return $this->responseOK("Usuario eliminado correctamente.", $user);
@@ -144,7 +144,31 @@ class UserController extends Controller
             return $this->responseOK('Login correcto, bienvenid@ '.Auth::user()->full_name, $user);
         }
 
-        return $this->responseFAIL('Error al iniciar sesión, credenciales incorrectas', "");
+        return $this->responseFAIL('Error al iniciar sesión, credenciales incorrectas', [""]);
+    }
+
+    public function changePassword(Request $request, $id)
+    {
+        if(! $request['password'])
+        {
+            return $this->responseFAIL('La contraseña no puede estar en blanco.', ['El campo contraseña es requerido.']);
+        }
+
+        $user = User::find($id);
+
+        if(! $user)
+        {
+            return $this->responseFAIL('Error al cambiar la contraseña, el usuario no está logueado.', [""]);
+        }
+
+        $user->password = $request['password'];
+
+        if(! $user->save())
+        {
+            return $this->responseFAIL('Error al actualizar la contraseña.',"");
+        }
+
+        return $this->responseOK('La contraseña ha sido cambiada correctamente.', $user);
     }
 
     public function getToken()
